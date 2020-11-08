@@ -5,8 +5,8 @@ Source code used for the computational modeling and fitting presented in Figure 
 The notebooks (`.ipynb`) run in jupyterlab or jupyter notebook, for this you'll need to [install jupyter](https://jupyter.readthedocs.io/en/latest/install.html).
 
 When you have a jupyter environment, either install the required packages:
-* using `pip`: `pip install numpy scipy matplotlib seaborn pandas statsmodels pyDOE`
-* using `conda`: `conda install numpy scipy matplotlib seaborn pandas statsmodels pyDOE`
+* using `pip`: `pip install numpy scipy matplotlib seaborn pandas statsmodels pyDOE prettytable`
+* using `conda`: `conda install numpy scipy matplotlib seaborn pandas statsmodels pyDOE prettytable`
 
 # Contents
 

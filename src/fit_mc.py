@@ -1,9 +1,7 @@
-import os
 import numpy as np
 import pandas as pd
-import copy
 from multiprocessing import Pool, Lock
-from scipy.optimize import curve_fit, minimize, least_squares
+from scipy.optimize import curve_fit, least_squares
 
 
 def run_curve_fit(pars):
@@ -23,7 +21,8 @@ def run_curve_fit(pars):
             flog.close()
         return [*popt, *p0, err]
     except RuntimeError:
-        print('could not fit with p0 = [{}]'.format(','.join([str(p) for p in p0])))
+        print('could not fit with p0 = [{}]'.format(
+            ','.join([str(p) for p in p0])))
         return None
 
 
@@ -46,7 +45,8 @@ def run_curve_fit_mc(pars):
             lock.release()
         return [*popt, *p0, err]
     except RuntimeError:
-        print('could not fit with p0 = [{}]'.format(','.join([str(p) for p in p0])))
+        print('could not fit with p0 = [{}]'.format(
+            ','.join([str(p) for p in p0])))
         return None
 
 
@@ -63,22 +63,26 @@ def fit_pars(f, xdata, ydata, yerr, p0_list, parnames, bounds=(-np.inf, np.inf),
         flog.write('\terr')
         flog.close()
     # run fitting
-    df_pars = pd.DataFrame(columns=parnames + ['{}0'.format(pn) for pn in parnames] + ['err'])
+    df_pars = pd.DataFrame(
+        columns=parnames + ['{}0'.format(pn) for pn in parnames] + ['err'])
     if ncores > 1:
         l = Lock()
         p = Pool(processes=ncores, initializer=init, initargs=(l,))
-        out = p.map(run_curve_fit_mc, [[f, xdata, ydata, yerr, p0, bounds, fn_log] for p0 in p0_list])
+        out = p.map(run_curve_fit_mc, [
+                    [f, xdata, ydata, yerr, p0, bounds, fn_log] for p0 in p0_list])
         for row in out:
             if row is None:
                 continue
-            df_pars = df_pars.append(pd.DataFrame([[*row]], columns=df_pars.columns))
+            df_pars = df_pars.append(pd.DataFrame(
+                [[*row]], columns=df_pars.columns))
         p.terminate()
     else:
         for p0 in p0_list:
             row = run_curve_fit([f, xdata, ydata, yerr, p0, bounds, fn_log])
             if row is None:
                 continue
-            df_pars = df_pars.append(pd.DataFrame([[*row]], columns=df_pars.columns))
+            df_pars = df_pars.append(pd.DataFrame(
+                [[*row]], columns=df_pars.columns))
     return df_pars
 
 
@@ -100,10 +104,12 @@ def fit_pars_lsq(f_res, p0_list, parnames, bounds=(-np.inf, np.inf), ncores=25, 
             if row is None:
                 continue
             if df_pars is None:
-                rescols = ['r{}'.format(i) for i in range(1,len(row)-2*len(parnames)-1)]
+                rescols = ['r{}'.format(i) for i in range(
+                    1, len(row)-2*len(parnames)-1)]
                 df_pars = pd.DataFrame(columns=parnames + ['{}0'.format(pn) for pn in parnames]
-                                               + ['err', 'status']+rescols)
-            df_pars = df_pars.append(pd.DataFrame([[*row]], columns=df_pars.columns))
+                                       + ['err', 'status']+rescols)
+            df_pars = df_pars.append(pd.DataFrame(
+                [[*row]], columns=df_pars.columns))
         p.terminate()
     else:
         for p0 in p0_list:
@@ -111,10 +117,12 @@ def fit_pars_lsq(f_res, p0_list, parnames, bounds=(-np.inf, np.inf), ncores=25, 
             if row is None:
                 continue
             if df_pars is None:
-                rescols = ['r{}'.format(i) for i in range(1,len(row)-2*len(parnames)-1)]
+                rescols = ['r{}'.format(i) for i in range(
+                    1, len(row)-2*len(parnames)-1)]
                 df_pars = pd.DataFrame(columns=parnames + ['{}0'.format(pn) for pn in parnames]
-                                               + ['err', 'status']+rescols)
-            df_pars = df_pars.append(pd.DataFrame([[*row]], columns=df_pars.columns))
+                                       + ['err', 'status']+rescols)
+            df_pars = df_pars.append(pd.DataFrame(
+                [[*row]], columns=df_pars.columns))
     return df_pars
 
 
@@ -132,5 +140,6 @@ def run_lsq(pars):
             lock.release()
         return [*res.x, *p0, res.cost, res.status, *res.fun]
     except RuntimeError:
-        print('could not fit with p0 = [{}]'.format(','.join([str(p) for p in p0])))
+        print('could not fit with p0 = [{}]'.format(
+            ','.join([str(p) for p in p0])))
         return None
